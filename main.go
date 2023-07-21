@@ -27,20 +27,28 @@ func main() {
 				DefaultText: "1",
 			},
 			&cli.StringFlag{
+				Name:        "idp-account",
+				Usage:       "AWS account (partial match works if it matches exactly 1 profile)",
+				Value:       "",
+				DefaultText: "",
+			},
+			&cli.StringFlag{
 				Name:        "profile",
-				Usage:       "AWS profile (partial match works if it matches exactly 1 profile)",
+				Usage:       "AWS profile name",
 				Value:       "",
 				DefaultText: "",
 			},
 		},
 		Action: func(c *cli.Context) error {
 			count := c.Int("count")
-			inputProfile := c.String("profile")
-			matchedProfiles := findProfile(inputProfile)
+			profileName := c.String("profile")
+			idpAccount := c.String("idp-account")
+			matchedProfiles := findProfile(idpAccount)
 
 			fmt.Println("**********************************************")
 			fmt.Println("Count:", count)
-			fmt.Println("Input Profile:", inputProfile)
+			fmt.Println("IDP Account:", idpAccount)
+			fmt.Println("Profile:", profileName)
 			fmt.Println("Matched Profiles:", matchedProfiles)
 			fmt.Println("**********************************************")
 
@@ -49,10 +57,10 @@ func main() {
 			}
 
 			loginWrapper := func() {
-				login(matchedProfiles)
+				login(matchedProfiles, profileName)
 			}
 
-			interval := 59 * time.Minute
+			interval := 55 * time.Minute
 			Schedule(loginWrapper, interval, count)
 			return nil
 		},
@@ -64,14 +72,14 @@ func main() {
 	}
 }
 
-func login(profiles []string) error {
+func login(profiles []string, profileName string) error {
 	for _, profile := range profiles {
 		fmt.Printf("logging to %s ...\n", profile)
 		loginExecFlags := flags.LoginExecFlags{
 			CommonFlags: &flags.CommonFlags{
 				IdpAccount:      profile,
 				SkipPrompt:      true,
-				Profile:         profile,
+				Profile:         profileName,
 				DisableKeychain: false,
 			},
 			Force:       true,

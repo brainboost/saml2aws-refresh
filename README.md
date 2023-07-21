@@ -33,6 +33,7 @@ COMMANDS:
 
 GLOBAL OPTIONS:
    --count value    No. of times session has to be refreshed (default: 1)
-   --profile value  AWS profile (partial match works if it matches exactly 1 profile)
+   --idp-account    AWS IdP account string (same as in saml2aws)
+   --profile value  AWS profile name to refer to
    --help, -h       show help (default: false)
 ```
